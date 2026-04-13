@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hotel — Sistema de Reservas</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+    }
+
+    header {
+      background: #2b6cb0;
+      color: white;
+      padding: 18px 32px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      padding: 14px 32px;
+      background: #ebf4ff;
+      border-bottom: 1px solid #bee3f8;
+    }
+
+    nav button {
+      padding: 8px 20px;
+      border: 1px solid #bee3f8;
+      border-radius: 6px;
+      cursor: pointer;
+      background: white;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    nav button.active, nav button:hover {
+      background: #2b6cb0;
+      color: white;
+      border-color: #2b6cb0;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 28px auto;
+      padding: 0 16px;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: #2b6cb0;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+
+    label { font-size: 0.82rem; color: #718096; }
+
+    input, select {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus { border-color: #2b6cb0; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    button.btn {
+      padding: 8px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+    }
+    button.btn:hover { opacity: 0.85; }
+
+    .btn-primary   { background: #2b6cb0; color: white; }
+    .btn-warning   { background: #d69e2e; color: white; }
+    .btn-danger    { background: #e53e3e; color: white; }
+    .btn-secondary { background: #a0aec0; color: white; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+    th {
+      background: #2b6cb0;
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    td { padding: 9px 12px; border-bottom: 1px solid #e2e8f0; }
+
+    tr:hover td { background: #ebf8ff; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.78rem;
+      background: #bee3f8;
+      color: #2b6cb0;
+    }
+
+    /* ── Lista ── */
+    .lista-container {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      padding: 10px 0;
+    }
+    .nodo { display: flex; align-items: center; }
+    .nodo-box {
+      background: white;
+      border: 2px solid #2b6cb0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 150px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .nodo-titulo {
+      font-size: 0.72rem; color: #718096;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+    }
+    .nodo-nombre { font-weight: 600; color: #2b6cb0; font-size: 0.9rem; }
+    .nodo-hab    { font-size: 0.82rem; color: #4a5568; margin-top: 2px; }
+    .nodo-next   {
+      font-size: 0.7rem; color: #a0aec0;
+      margin-top: 6px; border-top: 1px solid #e2e8f0; padding-top: 4px;
+    }
+    .flecha      { font-size: 1.4rem; color: #2b6cb0; padding: 0 8px; }
+    .flecha-null { font-size: 0.8rem; color: #a0aec0; padding: 0 8px; font-style: italic; }
+    .nodo-head {
+      background: #2b6cb0; color: white;
+      border-radius: 8px; padding: 8px 14px;
+      font-weight: 600; font-size: 0.85rem; margin-right: 6px;
+    }
+    .lista-vacia { color: #a0aec0; font-style: italic; padding: 20px 0; }
+    .lista-stats { display: flex; gap: 16px; margin-top: 4px; flex-wrap: wrap; }
+    .stat-box {
+      background: #2b6cb0; color: white;
+      border-radius: 8px; padding: 10px 18px;
+      font-size: 0.9rem; text-align: center;
+    }
+    .stat-box span { display: block; font-size: 1.5rem; font-weight: 700; }
+
+    #msg {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #38a169;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: none;
+      font-size: 0.9rem;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+<header>🏨 Hotel — Sistema de Gestión</header>
+
+<nav>
+  <button class="active" onclick="showSection('reservas')">Reservas</button>
+  <button onclick="showSection('huespedes')">Huéspedes</button>
+  <button onclick="showSection('habitaciones')">Habitaciones</button>
+  <button onclick="showSection('lista')">🔗 Lista</button>
+</nav>
+
+<main>
+
+  
+  <div id="sec-reservas" class="section active">
+    <div class="card">
+      <h2 id="form-title-r">➕ Nueva Reserva</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID Reserva</label>
+          <input id="r-id" placeholder="Ej: R001" />
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="r-fecha" />
+        </div>
+        <div class="form-group">
+          <label>Hora</label>
+          <input id="r-hora" placeholder="Ej: 14:00" />
+        </div>
+        <div class="form-group">
+          <label>ID Huésped</label>
+          <input id="r-hue" placeholder="Ej: H001" />
+        </div>
+        <div class="form-group">
+          <label>ID Habitación</label>
+          <input type="number" id="r-hab" placeholder="Ej: 1" />
+        </div>
+        <div class="form-group">
+          <label>ID Pago</label>
+          <input id="r-pago" placeholder="Ej: P001" />
+        </div>
+        <div class="form-group">
+          <label>ID Servicio</label>
+          <input id="r-serv" placeholder="Ej: S001" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary"   onclick="guardarReserva()">💾 Guardar</button>
+        <button class="btn btn-secondary" onclick="limpiarReserva()">✖ Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Lista de Reservas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Fecha</th><th>Hora</th>
+            <th>Huésped</th><th>Habitación</th><th>Pago</th><th>Servicio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tabla-reservas"></tbody>
+      </table>
+    </div>
+  </div>
+
+ 
+  <div id="sec-huespedes" class="section">
+    <div class="card">
+      <h2 id="form-title-h">➕ Nuevo Huésped</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID</label>
+          <input id="h-id" placeholder="Ej: H001" />
+        </div>
+        <div class="form-group">
+          <label>Nombre</label>
+          <input id="h-nombre" placeholder="Nombre completo" />
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="number" id="h-tel" placeholder="Ej: 3001234567" />
+        </div>
+        <div class="form-group">
+          <label>Edad</label>
+          <input id="h-edad" placeholder="Ej: 30" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary"   onclick="guardarHuesped()">💾 Guardar</button>
+        <button class="btn btn-secondary" onclick="limpiarHuesped()">✖ Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Lista de Huéspedes</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>Edad</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="tabla-huespedes"></tbody>
+      </table>
+    </div>
+  </div>
+
+  
+  <div id="sec-habitaciones" class="section">
+    <div class="card">
+      <h2 id="form-title-hab">➕ Nueva Habitación</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>ID</label>
+          <input type="number" id="hab-id" placeholder="Ej: 1" />
+        </div>
+        <div class="form-group">
+          <label>N° Habitación</label>
+          <input type="number" id="hab-n" placeholder="Ej: 101" />
+        </div>
+        <div class="form-group">
+          <label>Max. Huéspedes</label>
+          <input type="number" id="hab-hue" placeholder="Ej: 2" />
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary"   onclick="guardarHabitacion()">💾 Guardar</button>
+        <button class="btn btn-secondary" onclick="limpiarHabitacion()">✖ Limpiar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Lista de Habitaciones</h2>
+      <table>
+        <thead>
+          <tr><th>ID</th><th>N° Hab.</th><th>Max. Huéspedes</th><th>Acciones</th></tr>
+        </thead>
+        <tbody id="tabla-habitaciones"></tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <div id="sec-lista" class="section">
+    <div class="card">
+      <h2>🔗 Lista de Huéspedes con Reserva</h2>
+      <div class="lista-stats" id="lista-stats"></div>
+    </div>
+
+    <div class="card">
+      <h2>Nodos</h2>
+      <div id="lista-visual" class="lista-container">
+        <span class="lista-vacia">Cargando...</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div id="msg"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let editMode = { reservas: false, huespedes: false, habitaciones: false };
+
+  function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById('sec-' + name).classList.add('active');
+    event.target.classList.add('active');
+    if (name === 'reservas')     cargarReservas();
+    if (name === 'huespedes')    cargarHuespedes();
+    if (name === 'habitaciones') cargarHabitaciones();
+    if (name === 'lista')        cargarLista();
+  }
+
+  function toast(msg, ok = true) {
+    const el = document.getElementById('msg');
+    el.textContent = msg;
+    el.style.background = ok ? '#38a169' : '#e53e3e';
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 2800);
+  }
+
+  async function cargarReservas() {
+    const res  = await fetch(`${API}/reservas`);
+    const data = await res.json();
+    document.getElementById('tabla-reservas').innerHTML = data.map(r => `
+      <tr>
+        <td><span class="badge">${r.id_reservas}</span></td>
+        <td>${r.n_fecha ? r.n_fecha.split('T')[0] : '-'}</td>
+        <td>${r.n_hora || '-'}</td>
+        <td>${r.nombre_huesped || r.id_huespedes}</td>
+        <td>${r.n_habitacion || r.id_habitaciones}</td>
+        <td>${r.id_pago || '-'}</td>
+        <td>${r.id_servicio || '-'}</td>
+        <td>
+          <button class="btn btn-warning" onclick='editarReserva(${JSON.stringify(r)})'>✏️</button>
+          <button class="btn btn-danger"  onclick="eliminarReserva('${r.id_reservas.trim()}')">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function guardarReserva() {
+    const body = {
+      id_reservas:     document.getElementById('r-id').value.trim(),
+      n_fecha:         document.getElementById('r-fecha').value,
+      n_hora:          document.getElementById('r-hora').value.trim(),
+      id_huespedes:    document.getElementById('r-hue').value.trim(),
+      id_habitaciones: document.getElementById('r-hab').value,
+      id_pago:         document.getElementById('r-pago').value.trim(),
+      id_servicio:     document.getElementById('r-serv').value.trim(),
+    };
+    const isEdit = editMode.reservas;
+    const url    = isEdit ? `${API}/reservas/${body.id_reservas}` : `${API}/reservas`;
+    const res    = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data   = await res.json();
+    if (data.error) return toast('Error: ' + data.error, false);
+    toast(data.mensaje);
+    limpiarReserva();
+    cargarReservas();
+  }
+
+  function editarReserva(r) {
+    editMode.reservas = true;
+    document.getElementById('form-title-r').textContent = '✏️ Editar Reserva';
+    document.getElementById('r-id').value    = r.id_reservas.trim();
+    document.getElementById('r-id').disabled = true;
+    document.getElementById('r-fecha').value = r.n_fecha ? r.n_fecha.split('T')[0] : '';
+    document.getElementById('r-hora').value  = r.n_hora?.trim() || '';
+    document.getElementById('r-hue').value   = r.id_huespedes?.trim() || '';
+    document.getElementById('r-hab').value   = r.id_habitaciones || '';
+    document.getElementById('r-pago').value  = r.id_pago?.trim() || '';
+    document.getElementById('r-serv').value  = r.id_servicio?.trim() || '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function eliminarReserva(id) {
+    if (!confirm('¿Eliminar reserva ' + id + '?')) return;
+    const res  = await fetch(`${API}/reservas/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    toast(data.mensaje);
+    cargarReservas();
+  }
+
+  function limpiarReserva() {
+    editMode.reservas = false;
+    document.getElementById('form-title-r').textContent = '➕ Nueva Reserva';
+    ['r-id','r-fecha','r-hora','r-hue','r-hab','r-pago','r-serv'].forEach(id => {
+      document.getElementById(id).value    = '';
+      document.getElementById(id).disabled = false;
+    });
+  }
+
+ 
+
+  async function cargarHuespedes() {
+    const res  = await fetch(`${API}/huespedes`);
+    const data = await res.json();
+    document.getElementById('tabla-huespedes').innerHTML = data.map(h => `
+      <tr>
+        <td><span class="badge">${h.id_huespedes}</span></td>
+        <td>${h.nombre || '-'}</td>
+        <td>${h.telefono || '-'}</td>
+        <td>${h.edad?.trim() || '-'}</td>
+        <td>
+          <button class="btn btn-warning" onclick='editarHuesped(${JSON.stringify(h)})'>✏️</button>
+          <button class="btn btn-danger"  onclick="eliminarHuesped('${h.id_huespedes}')">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function guardarHuesped() {
+    const body = {
+      id_huespedes: document.getElementById('h-id').value.trim(),
+      nombre:       document.getElementById('h-nombre').value.trim(),
+      telefono:     document.getElementById('h-tel').value,
+      edad:         document.getElementById('h-edad').value.trim(),
+    };
+    const isEdit = editMode.huespedes;
+    const url    = isEdit ? `${API}/huespedes/${body.id_huespedes}` : `${API}/huespedes`;
+    const res    = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data   = await res.json();
+    if (data.error) return toast('Error: ' + data.error, false);
+    toast(data.mensaje);
+    limpiarHuesped();
+    cargarHuespedes();
+  }
+
+  function editarHuesped(h) {
+    editMode.huespedes = true;
+    document.getElementById('form-title-h').textContent = '✏️ Editar Huésped';
+    document.getElementById('h-id').value     = h.id_huespedes;
+    document.getElementById('h-id').disabled  = true;
+    document.getElementById('h-nombre').value = h.nombre || '';
+    document.getElementById('h-tel').value    = h.telefono || '';
+    document.getElementById('h-edad').value   = h.edad?.trim() || '';
+  }
+
+  async function eliminarHuesped(id) {
+    if (!confirm('¿Eliminar huésped ' + id + '?')) return;
+    const res  = await fetch(`${API}/huespedes/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    toast(data.mensaje);
+    cargarHuespedes();
+  }
+
+  function limpiarHuesped() {
+    editMode.huespedes = false;
+    document.getElementById('form-title-h').textContent = '➕ Nuevo Huésped';
+    ['h-id','h-nombre','h-tel','h-edad'].forEach(id => {
+      document.getElementById(id).value    = '';
+      document.getElementById(id).disabled = false;
+    });
+  }
+
+  
+  async function cargarHabitaciones() {
+    const res  = await fetch(`${API}/habitaciones`);
+    const data = await res.json();
+    document.getElementById('tabla-habitaciones').innerHTML = data.map(h => `
+      <tr>
+        <td><span class="badge">${h.id_habitaciones}</span></td>
+        <td>${h.n_habitacion || '-'}</td>
+        <td>${h.n_huespedes || '-'}</td>
+        <td>
+          <button class="btn btn-warning" onclick='editarHabitacion(${JSON.stringify(h)})'>✏️</button>
+          <button class="btn btn-danger"  onclick="eliminarHabitacion(${h.id_habitaciones})">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  async function guardarHabitacion() {
+    const body = {
+      id_habitaciones: document.getElementById('hab-id').value,
+      n_habitacion:    document.getElementById('hab-n').value,
+      n_huespedes:     document.getElementById('hab-hue').value,
+    };
+    const isEdit = editMode.habitaciones;
+    const url    = isEdit ? `${API}/habitaciones/${body.id_habitaciones}` : `${API}/habitaciones`;
+    const res    = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data   = await res.json();
+    if (data.error) return toast('Error: ' + data.error, false);
+    toast(data.mensaje);
+    limpiarHabitacion();
+    cargarHabitaciones();
+  }
+
+  function editarHabitacion(h) {
+    editMode.habitaciones = true;
+    document.getElementById('form-title-hab').textContent = '✏️ Editar Habitación';
+    document.getElementById('hab-id').value    = h.id_habitaciones;
+    document.getElementById('hab-id').disabled = true;
+    document.getElementById('hab-n').value     = h.n_habitacion || '';
+    document.getElementById('hab-hue').value   = h.n_huespedes || '';
+  }
+
+  async function eliminarHabitacion(id) {
+    if (!confirm('¿Eliminar habitación ' + id + '?')) return;
+    const res  = await fetch(`${API}/habitaciones/${id}`, { method: 'DELETE' });
+    const data = await res.json();
+    toast(data.mensaje);
+    cargarHabitaciones();
+  }
+
+  function limpiarHabitacion() {
+    editMode.habitaciones = false;
+    document.getElementById('form-title-hab').textContent = '➕ Nueva Habitación';
+    ['hab-id','hab-n','hab-hue'].forEach(id => {
+      document.getElementById(id).value    = '';
+      document.getElementById(id).disabled = false;
+    });
+  }
+
+  
+  class Nodo {
+    constructor(nombre, habitacion, idHuesped) {
+      this.nombre     = nombre;
+      this.habitacion = habitacion;
+      this.idHuesped  = idHuesped;
+      this.siguiente  = null;
+    }
+  }
+
+  class ListaEnlazada {
+    constructor() {
+      this.cabeza = null;
+      this.tam    = 0;
+    }
+
+    insertar(nombre, habitacion, idHuesped) {
+      const nuevoNodo = new Nodo(nombre, habitacion, idHuesped);
+      if (this.cabeza === null) {
+        this.cabeza = nuevoNodo;
+      } else {
+        let actual = this.cabeza;
+        while (actual.siguiente !== null) {
+          actual = actual.siguiente;
+        }
+        actual.siguiente = nuevoNodo;
+      }
+      this.tam++;
+    }
+
+    recorrer() {
+      const resultado = [];
+      let actual = this.cabeza;
+      while (actual !== null) {
+        resultado.push(actual);
+        actual = actual.siguiente;
+      }
+      return resultado;
+    }
+  }
+
+  async function cargarLista() {
+    const res  = await fetch(`${API}/reservas`);
+    const data = await res.json();
+
+    const lista = new ListaEnlazada();
+    data.forEach(r => {
+      lista.insertar(
+        r.nombre_huesped || r.id_huespedes,
+        r.n_habitacion   || r.id_habitaciones,
+        r.id_huespedes
+      );
+    });
+
+    const nodos     = lista.recorrer();
+    const container = document.getElementById('lista-visual');
+    const stats     = document.getElementById('lista-stats');
+
+    stats.innerHTML = `
+      <div class="stat-box"><span>${lista.tam}</span>Total huéspedes</div>
+      <div class="stat-box"><span>${lista.tam > 0 ? nodos[0].nombre.split(' ')[0] : '—'}</span>Primero</div>
+      <div class="stat-box"><span>${lista.tam > 0 ? nodos[lista.tam - 1].nombre.split(' ')[0] : '—'}</span>Último</div>
+    `;
+
+    if (nodos.length === 0) {
+      container.innerHTML = '<span class="lista-vacia">No hay reservas registradas.</span>';
+      return;
+    }
+
+    let html = '<span class="nodo-head">HEAD</span><span class="flecha">→</span>';
+    nodos.forEach((nodo, i) => {
+      const siguiente = nodo.siguiente ? nodo.siguiente.nombre : 'null';
+      html += `
+        <div class="nodo">
+          <div class="nodo-box">
+            <div class="nodo-titulo">Nodo ${i + 1}</div>
+            <div class="nodo-nombre">👤 ${nodo.nombre}</div>
+            <div class="nodo-hab">🏨 Hab. ${nodo.habitacion}</div>
+            <div class="nodo-next">siguiente → <strong>${siguiente}</strong></div>
+          </div>
+          ${i < nodos.length - 1
+            ? '<span class="flecha">→</span>'
+            : '<span class="flecha-null">→ null</span>'
+          }
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+
+
+  cargarReservas();
+</script>
+</body>
+</html>
