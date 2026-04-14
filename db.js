@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Conexión ───────────────────────────────────────────────────────────────
+
 const config = {
   connectionString: 'Driver={ODBC Driver 17 for SQL Server};Server=localhost\\SQLEXPRESS;Database=Hotel;Trusted_Connection=yes;'
 };
@@ -22,7 +22,7 @@ async function getPool() {
   return poolPromise;
 }
 
-// ── Rutas (igual que antes) ────────────────────────────────────────────────
+
 app.get('/api/huespedes', async (req, res) => {
   try {
     const pool   = await getPool();
@@ -31,6 +31,6 @@ app.get('/api/huespedes', async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ... el resto de tus rutas igual ...
+
 
 app.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
