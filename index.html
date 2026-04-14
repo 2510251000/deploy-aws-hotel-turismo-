@@ -131,7 +131,7 @@
       color: #2b6cb0;
     }
 
-    /* ── Lista ── */
+ 
     .lista-container {
       display: flex;
       flex-wrap: wrap;
@@ -200,7 +200,7 @@
 
 <main>
 
-  <!-- ════════ RESERVAS ════════ -->
+
   <div id="sec-reservas" class="section active">
     <div class="card">
       <h2 id="form-title-r">➕ Nueva Reserva</h2>
@@ -255,7 +255,7 @@
     </div>
   </div>
 
-  <!-- ════════ HUÉSPEDES ════════ -->
+ 
   <div id="sec-huespedes" class="section">
     <div class="card">
       <h2 id="form-title-h">➕ Nuevo Huésped</h2>
@@ -294,7 +294,7 @@
     </div>
   </div>
 
-  <!-- ════════ HABITACIONES ════════ -->
+
   <div id="sec-habitaciones" class="section">
     <div class="card">
       <h2 id="form-title-hab">➕ Nueva Habitación</h2>
@@ -329,7 +329,7 @@
     </div>
   </div>
 
-  <!-- ════════ LISTA ════════ -->
+
   <div id="sec-lista" class="section">
     <div class="card">
       <h2>🔗 Lista de Huéspedes con Reserva</h2>
@@ -371,9 +371,7 @@
     setTimeout(() => el.style.display = 'none', 2800);
   }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // RESERVAS
-  // ════════════════════════════════════════════════════════════════════════
+
   async function cargarReservas() {
     const res  = await fetch(`${API}/reservas`);
     const data = await res.json();
@@ -445,9 +443,7 @@
     });
   }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // HUÉSPEDES
-  // ════════════════════════════════════════════════════════════════════════
+
   async function cargarHuespedes() {
     const res  = await fetch(`${API}/huespedes`);
     const data = await res.json();
@@ -509,9 +505,7 @@
     });
   }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // HABITACIONES
-  // ════════════════════════════════════════════════════════════════════════
+
   async function cargarHabitaciones() {
     const res  = await fetch(`${API}/habitaciones`);
     const data = await res.json();
@@ -570,9 +564,7 @@
     });
   }
 
-  // ════════════════════════════════════════════════════════════════════════
-  // LISTA
-  // ════════════════════════════════════════════════════════════════════════
+
   class Nodo {
     constructor(nombre, habitacion, idHuesped) {
       this.nombre     = nombre;
@@ -662,7 +654,7 @@
     container.innerHTML = html;
   }
 
-  // Carga inicial
+  
   cargarReservas();
 </script>
 </body>
