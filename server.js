@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ── Conexión ───────────────────────────────────────────────────────────────
+
 const config = {
   connectionString: 'Driver={ODBC Driver 17 for SQL Server};Server=localhost\\SQLEXPRESS;Database=Hotel;Trusted_Connection=yes;'
 };
@@ -19,9 +19,6 @@ async function getPool() {
   return poolPromise;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// HUÉSPEDES
-// ══════════════════════════════════════════════════════════════════════════════
 
 app.get('/api/huespedes', async (req, res) => {
   try {
@@ -90,9 +87,6 @@ app.delete('/api/huespedes/:id', async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// HABITACIONES
-// ══════════════════════════════════════════════════════════════════════════════
 
 app.get('/api/habitaciones', async (req, res) => {
   try {
@@ -146,9 +140,6 @@ app.delete('/api/habitaciones/:id', async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════════════════════════════════
-// RESERVAS
-// ══════════════════════════════════════════════════════════════════════════════
 
 app.get('/api/reservas', async (req, res) => {
   try {
@@ -218,7 +209,6 @@ app.delete('/api/reservas/:id', async (req, res) => {
   }
 });
 
-// ── Iniciar servidor ───────────────────────────────────────────────────────
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
